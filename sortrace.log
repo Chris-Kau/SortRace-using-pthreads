@@ -1,0 +1,12 @@
+Generating 1000000 random numbers
+Starting system sort
+
+real	0m0.001s
+user	0m0.001s
+sys	0m0.000s
+Starting mysort
+
+real	0m0.003s
+user	0m0.002s
+sys	0m0.000s
+sort: mysort.out:126: disorder: -99518
