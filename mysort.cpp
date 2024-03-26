@@ -32,10 +32,42 @@ void *bridge(void *ptr)
 	sortStuff *arg = (sortStuff *)ptr;
 	bubble(arg->start, arg->size);
 }
+
+int *merge(int A[], int B[], int size){
+	int *temp = new int[size*2];
+	int i, j, k;
+
+	//compares values of array1 to array2 to append the lower value first to temp
+	while(i < size && j < size)
+	{
+		if(A[i] <= B[i]){
+			temp[k] = A[i];
+			i++;
+		}else{
+			temp[k] = B[j];
+			j++;
+		}
+		k++;
+	}
+
+	//get remaining nums we might have missed
+	while(i < size){
+		temp[k] = A[i];
+		k++;
+		i++;
+	}
+	//get remaining nums we might have missed
+	while(j < size){
+		temp[k] = B[j];
+		k++;
+		j++;
+	}
+
+	return temp;	
+}
 int main(int argc, char*argv[])
 {
-	//split array in 8 sections for 8 threads
-	int *numbers = new int[1000];
+	int *numbers = new int[1000000];
 	ifstream file;
 	file.open(argv[1]);
 	string temp;
@@ -49,35 +81,35 @@ int main(int argc, char*argv[])
 
 	sortStuff ss0;
 	ss0.start = &numbers[0];
-	ss0.size = 125;
+	ss0.size = 125000;
 
 	sortStuff ss1;
-	ss1.start = &numbers[125];
-	ss1.size = 125;
+	ss1.start = &numbers[125000];
+	ss1.size = 125000;
 
 	sortStuff ss2;
-	ss2.start = &numbers[250];
-	ss2.size = 125;
+	ss2.start = &numbers[250000];
+	ss2.size = 125000;
 
 	sortStuff ss3;
-	ss3.start = &numbers[375];
-	ss3.size = 125;
+	ss3.start = &numbers[375000];
+	ss3.size = 125000;
 
 	sortStuff ss4;
-	ss4.start = &numbers[500];
-	ss4.size = 125;
+	ss4.start = &numbers[500000];
+	ss4.size = 125000;
 
 	sortStuff ss5;
-	ss5.start = &numbers[625];
-	ss5.size = 125;
+	ss5.start = &numbers[625000];
+	ss5.size = 125000;
 
 	sortStuff ss6;
-	ss6.start = &numbers[750];
-	ss6.size = 125;
+	ss6.start = &numbers[750000];
+	ss6.size = 125000;
 
 	sortStuff ss7;
-	ss7.start = &numbers[875];
-	ss7.size = 125;
+	ss7.start = &numbers[875000];
+	ss7.size = 125000;
 
 	pthread_t t0, t1, t2, t3, t4, t5, t6, t7;
 
@@ -99,13 +131,28 @@ int main(int argc, char*argv[])
 	pthread_join(t6, NULL);
 	pthread_join(t7, NULL);
 	
+	int *section1 = merge(ss0.start, ss1.start, 125000);
+	int *section2 = merge(ss2.start, ss3.start, 125000);
+	int *section3 = merge(ss4.start, ss5.start, 125000);
+	int *section4 = merge(ss6.start, ss7.start, 125000);
+
+	int *sec1sec2 = merge(section1, section2, 250000);
+	int *sec3sec4 = merge(section1, section2, 250000);
+
+	int *allsecs = merge(sec1sec2, sec3sec4, 500000);
 
 	ofstream fout(argv[2]);
-	for(int i = 0; i <= 1000; i++){
-		fout << numbers[i] << endl;
+	for(int i = 0; i <= 1000000; i++){
+		fout << allsecs[i] << endl;
 	}
 
-
+	delete[] section1;
+	delete[] section2;
+	delete[] section3;
+	delete[] section4;
+	delete[] sec1sec2;
+	delete[] sec3sec4;
+	delete[] allsecs;
 	delete[] numbers;
 	return 0;
 }
